@@ -11,7 +11,19 @@ data class AppPojoCSV(
     val minSdk: Int,
     @JsonProperty("target_sdk")
     val targetSdk: Int,
-   // val permissions: List<String>,
-  //  val providers: List<String>,
-//    val services: List<String>
+    val sha1: String?,
+    val sha256: String?,
+    @JsonProperty("issuer_human_friendly")
+    val issuerHumanFriendly: String?,
+    @JsonProperty("subject_human_friendly")
+    val subjectHumanFriendly: String?,
+    @JsonProperty("hash_algo")
+    val hashAlgo: String?,
+    @JsonProperty("signature_algo")
+    val signatureAlgo: String?,
+    @JsonProperty("serial_number")
+    val serialNumber: String?,
+  //  val permissions: List<String>,
+    val providers: Int,
+    val services: Int
 )

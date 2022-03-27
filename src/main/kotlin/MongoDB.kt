@@ -7,8 +7,6 @@ import org.litote.kmongo.reactivestreams.KMongo
 import java.io.FileWriter
 
 
-data class Jedi(val name: String, val age: Int)
-
 val csvMapper = CsvMapper().apply {
     registerModule(KotlinModule())
 }
@@ -25,24 +23,37 @@ fun main() {
 
         val list: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "AUTO_AND_VEHICLES").toList()
 
-        writeCsvFile(mapListDbModelToListEntity(list), "checkData")
+        list
+
+        writeCsvFile(mapListDbModelToListEntity(list), "check_data.csv")
         println("Done")
     }
 }
 
-fun convertDataList(list: List<AppPojoMongo>): List<String>{
+fun convertDataList(list: List<AppPojoMongo>): List<String> {
     return listOf()
 }
 
 private fun mapDbToCsvValue(appPojoMongo: AppPojoMongo) =
-    AppPojoCSV(
-        appName = appPojoMongo.appName,
-        activities = appPojoMongo.activities.size,
-        category = appPojoMongo.category,
-        maxSdk = appPojoMongo.maxSdk,
-        minSdk = appPojoMongo.minSdk,
-        targetSdk = appPojoMongo.targetSdk
-    )
+    with(appPojoMongo) {
+        AppPojoCSV(
+            appName = appName,
+            activities = activities.size,
+            category = category,
+            maxSdk = maxSdk,
+            minSdk = minSdk,
+            targetSdk = targetSdk,
+            sha1 = certificate.sha1,
+            sha256 = certificate.sha256,
+            issuerHumanFriendly = certificate.issuerHumanFriendly,
+            subjectHumanFriendly = certificate.subjectHumanFriendly,
+            hashAlgo = certificate.hashAlgo,
+            signatureAlgo = certificate.signatureAlgo,
+            serialNumber = certificate.serialNumber,
+            providers = providers.size,
+            services = services.size
+        )
+    }
 
 fun mapListDbModelToListEntity(list: List<AppPojoMongo>) = list.map {
     mapDbToCsvValue(it)

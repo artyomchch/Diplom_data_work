@@ -7,7 +7,8 @@ data class AppPojoMongo(
     val appName: String,
     val category: String,
     val certificate: Certificate,
-    val intentFilters: IntentFilters?,
+    @JsonProperty("intent_filters")
+    val intentFilters: ArrayList<Intents>?,
     @JsonProperty("max_sdk")
     val maxSdk: Int,
     @JsonProperty("min_sdk")
@@ -36,7 +37,7 @@ data class Certificate(
 )
 
 data class IntentFilters(
-    val intents: List<Intents>?
+    val intents: ArrayList<Intents>?
 )
 
 data class Intents(
