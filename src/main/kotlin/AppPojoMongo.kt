@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 
 
@@ -7,8 +8,8 @@ data class AppPojoMongo(
     val appName: String,
     val category: String,
     val certificate: Certificate,
-    @JsonProperty("intent_filters")
-    val intentFilters: ArrayList<Intents>?,
+//    @JsonProperty("intent_filters")
+//    val intentFilters: List<IntentFilters>?,
     @JsonProperty("max_sdk")
     val maxSdk: Int,
     @JsonProperty("min_sdk")
@@ -37,7 +38,8 @@ data class Certificate(
 )
 
 data class IntentFilters(
-    val intents: ArrayList<Intents>?
+    @JsonIgnoreProperties
+    val intents: List<Intents>?
 )
 
 data class Intents(

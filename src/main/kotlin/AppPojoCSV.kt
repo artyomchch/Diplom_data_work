@@ -23,7 +23,7 @@ data class AppPojoCSV(
     val signatureAlgo: String?,
     @JsonProperty("serial_number")
     val serialNumber: String?,
-  //  val permissions: List<String>,
+    val permissions: List<String>,
     val providers: Int,
     val services: Int
 )
