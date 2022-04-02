@@ -8,8 +8,8 @@ data class AppPojoMongo(
     val appName: String,
     val category: String,
     val certificate: Certificate,
-//    @JsonProperty("intent_filters")
-//    val intentFilters: List<IntentFilters>?,
+    @JsonProperty("intent_filters")
+    val intentFilters: LinkedHashMap<String, LinkedHashMap<String, List<String>>>?,
     @JsonProperty("max_sdk")
     val maxSdk: Int,
     @JsonProperty("min_sdk")
@@ -37,10 +37,10 @@ data class Certificate(
     val serialNumber: String?
 )
 
-data class IntentFilters(
-    @JsonIgnoreProperties
-    val intents: List<Intents>?
-)
+//data class IntentFilters(
+//    @JsonProperty("*")
+//    val intents: List<Intents>?
+//)
 
 data class Intents(
     val action: List<String>?,

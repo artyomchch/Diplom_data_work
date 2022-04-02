@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.coroutine
 import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
+import org.litote.kmongo.util.idValue
 import java.io.FileWriter
 
 
@@ -19,14 +20,23 @@ fun main() {
     val col = database.getCollection<AppPojoMongo>("collection_methods") //KMongo extension method
 
 
-//async now
+
     runBlocking {
 
         val list: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "AUTO_AND_VEHICLES").toList()
 
-        val uniquePermissions = convertListUniquePermissions(list)
-        uniquePermissions
+        list.forEach {
+            it.intentFilters?.values?.forEach { cat->
+                cat.values.forEach{ str->
+                    println(str)
+                }
 
+
+            }
+            }
+
+        list
+        writeColumnsPermissionCSV(list)
 
         writeCsvFile(mapListDbModelToListEntity(list), "check_data.csv")
         println("Done")
@@ -44,6 +54,31 @@ fun convertListUniquePermissions(listApps: List<AppPojoMongo>): List<String> {
     return mapOfPermission.filter { it.value > 2 }.map { it.key }.toList()
 }
 
+fun writeColumnsPermissionCSV(list: List<AppPojoMongo>) {
+    val uniquePermissions = convertListUniquePermissions(list)
+    val codePermissionApp = mutableListOf<Int>()
+    val rows: MutableList<MutableList<Any>> = mutableListOf()
+    var trigger = false
+    rows.add(uniquePermissions.toMutableList())
+
+
+    list.forEach {
+        uniquePermissions.forEach { perm ->
+            it.permissions.forEach { permissionFullName ->
+                if (permissionFullName.split(".").last() == (perm)) trigger = true
+            }
+            if (trigger) {
+                codePermissionApp.add(1)
+                trigger = false
+            } else codePermissionApp.add(0)
+        }
+
+        rows.add(codePermissionApp.toMutableList())
+        codePermissionApp.clear()
+
+    }
+    csvWriter().writeAll(rows, "test.csv")
+}
 //    val map = mapOf("122" to 2, "3455" to 3)
 //    println(map.flatMap { (key, value) -> key.take(value).toList() }) // [1, 2, 3, 4, 5]
 
@@ -52,7 +87,6 @@ private fun mapDbToCsvValue(appPojoMongo: AppPojoMongo) =
         AppPojoCSV(
             appName = appName,
             activities = activities.size,
-            permissions = permissions,
             category = category,
             maxSdk = maxSdk,
             minSdk = minSdk,
@@ -71,12 +105,6 @@ private fun mapDbToCsvValue(appPojoMongo: AppPojoMongo) =
 
 fun mapListDbModelToListEntity(list: List<AppPojoMongo>) = list.map {
     mapDbToCsvValue(it)
-}
-
-fun writeColumnsPermissionCSV() {
-    val rows = listOf(listOf("a", "b", "c", "d"), listOf("d", "e", "f", "sd"),  listOf("d", "e", "f", "sd"),  listOf("d", "e", "f", "sd"),  listOf("d", "e", "f", "sd"),
-        listOf("d", "e", "f", "sd"))
-    csvWriter().writeAll(rows, "test.csv",)
 }
 
 
