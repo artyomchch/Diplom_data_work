@@ -1,17 +1,28 @@
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
+import java.io.File
 import java.io.FileWriter
 
 class Mapper {
 
     fun concatAllDataFrames(list: List<AppPojoMongo>, nameDataFrame: String) {
+
+
         val conRows: MutableList<List<Any>> = mutableListOf()
         val permissions = writeColumnsPermissionCSV(list)
         val intentFilters = writeColumnsIntentFiltersCSV(list)
         val inputMethods = writeColumnsInputMethodsCSV(list)
         val outputMethods = writeColumnsOutputMethodsCSV(list)
 
+        writeCsvFile(mapListDbModelToListEntity(list), NAME_MAIN_FILE)
+
+        val file = File(NAME_MAIN_FILE)
+        val rows: List<List<String>> = csvReader().readAll(file)
+
+
+
         writeColumnsInputMethodsCSV(list).indices.forEach {
-            conRows.add(listOf(permissions[it], intentFilters[it], inputMethods[it], outputMethods[it]).flatten())
+            conRows.add(listOf(rows[it], permissions[it], intentFilters[it], inputMethods[it], outputMethods[it]).flatten())
         }
         csvWriter().writeAll(conRows, nameDataFrame)
     }
@@ -211,18 +222,22 @@ class Mapper {
             )
         }
 
-    fun mapListDbModelToListEntity(list: List<AppPojoMongo>) = list.map {
+    private fun mapListDbModelToListEntity(list: List<AppPojoMongo>) = list.map {
         mapDbToCsvValue(it)
     }
 
 
-    inline fun <reified T> writeCsvFile(data: Collection<T>, fileName: String) {
+    private inline fun <reified T> writeCsvFile(data: Collection<T>, fileName: String) {
         FileWriter(fileName).use { writer ->
             csvMapper.writer(csvMapper.schemaFor(T::class.java).withHeader())
                 .writeValues(writer)
                 .writeAll(data)
                 .close()
         }
+    }
+
+    companion object {
+        const val NAME_MAIN_FILE = "base_data.csv"
     }
 
 }

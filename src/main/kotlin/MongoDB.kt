@@ -34,7 +34,7 @@ fun main() {
 
 
 
-        mapper.writeCsvFile(mapper.mapListDbModelToListEntity(list), "base_data.csv")
+    //    mapper.writeCsvFile(mapper.mapListDbModelToListEntity(list), "base_data.csv")
 
         mapper.concatAllDataFrames(list, "part2.csv")
 
