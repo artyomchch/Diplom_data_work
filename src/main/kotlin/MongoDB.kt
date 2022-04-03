@@ -32,12 +32,19 @@ fun main() {
 
         val list: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "AUTO_AND_VEHICLES").toList()
 
+
+
         mapper.writeCsvFile(mapper.mapListDbModelToListEntity(list), "base_data.csv")
 
-        mapper.writeColumnsPermissionCSV(list, "permission.csv")
+        mapper.concatAllDataFrames(list, "part2.csv")
 
-        mapper.writeColumnsIntentFiltersCSV(list, "intent_filters.csv")
+       // mapper.writeColumnsPermissionCSV(list, "permission.csv")
 
+       // mapper.writeColumnsIntentFiltersCSV(list, "intent_filters.csv")
+
+       // mapper.writeColumnsInputMethodsCSV(list, "input_methods.csv")
+
+       // mapper.writeColumnsOutputMethodsCSV(list, "output_methods.csv")
 
 
 
