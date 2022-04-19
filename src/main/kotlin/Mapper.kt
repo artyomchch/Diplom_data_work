@@ -1,3 +1,4 @@
+import Categories.*
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import java.io.File
@@ -51,9 +52,9 @@ class Mapper {
             codePermissionApp.clear()
 
         }
-        // csvWriter().writeAll(rows, nameFrame)
+
         return rows
-    }
+    } //READ_EPG_DATA
 
     private fun convertListUniquePermissions(listApps: List<AppPojoMongo>): List<String> {
         val mapOfPermission = mutableMapOf<String, Int>()
@@ -63,7 +64,7 @@ class Mapper {
                 .forEach { perm -> mapOfPermission.merge((perm.split(".").last()), 1, Int::plus) }
         }
 
-        return mapOfPermission.filter { it.value > 2 }.map { it.key }.toList()
+        return mapOfPermission.filter { it.value > 10 }.map { it.key }.toList()
     }
 
 
@@ -137,7 +138,6 @@ class Mapper {
             codeInputMethods.clear()
 
         }
-        // csvWriter().writeAll(rows, nameFrame)
         return rows
     }
 
@@ -181,7 +181,6 @@ class Mapper {
             codeOutputMethods.clear()
 
         }
-        // csvWriter().writeAll(rows, nameFrame)
         return rows
     }
 
@@ -236,8 +235,26 @@ class Mapper {
         }
     }
 
+    private fun changeCategory(category: String): String {
+        when (Categories.valueOf(category)) {
+            GAME_CASINO, GAME_SIMULATION, GAME_CARD, GAME_CASUAL, GAME_SPORTS, GAME_MUSIC, GAME_BOARD, GAME_TRIVIA, GAME_PUZZLE, GAME_ADVENTURE, GAME_STRATEGY,
+            GAME_ARCADE, GAME_RACING, GAME_ACTION, GAME_ROLE_PLAYING, GAME_EDUCATIONAL, GAME_WORD -> return GAMES.name
+            BOOKS_AND_REFERENCE, COMICS, NEWS_AND_MAGAZINES, EVENTS, LIBRARIES_AND_DEMO -> return BOOKS_AND_NEWS.name
+            SOCIAL, DATING, COMMUNICATION -> return COMMUNICATION.name
+            TRAVEL_AND_LOCAL, MAPS_AND_NAVIGATION -> TRAVEL.name
+            SHOPPING, FOOD_AND_DRINK, ENTERTAINMENT, LIFESTYLE, BEAUTY -> return ENTERTAINMENT.name
+            HEALTH_AND_FITNESS, AUTO_AND_VEHICLES, SPORTS -> return LIFESTYLE.name
+            BUSINESS, PARENTING, WEATHER -> return OTHER.name
+            MUSIC_AND_AUDIO, PERSONALIZATION, HOUSE_AND_HOME, PHOTOGRAPHY, VIDEO_PLAYERS, PRODUCTIVITY, TOOLS -> return TOOLS.name
+            EDUCATION, FINANCE, MEDICAL, ART_AND_DESIGN -> return OTHER.name
+            else -> return UNDEFINED
+        }
+       return UNDEFINED
+    }
+
     companion object {
         const val NAME_MAIN_FILE = "base_data.csv"
+        const val UNDEFINED = "UNDEFINED_CATEGORY"
     }
 
 }

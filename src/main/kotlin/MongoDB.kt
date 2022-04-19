@@ -29,14 +29,14 @@ fun main() {
 
 
     runBlocking {
-
-        val list: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "AUTO_AND_VEHICLES").toList()
+     //   val list: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "TOOLS").toList()
+        val list2: List<AppPojoMongo> = col.findAndCast<AppPojoMongo>().toList()
 
 
 
     //    mapper.writeCsvFile(mapper.mapListDbModelToListEntity(list), "base_data.csv")
 
-        mapper.concatAllDataFrames(list, "part2.csv")
+        mapper.concatAllDataFrames(list2, "ALL_WITHOUT_FILTERS.csv")
 
        // mapper.writeColumnsPermissionCSV(list, "permission.csv")
 
