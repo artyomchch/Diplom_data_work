@@ -16,7 +16,7 @@ class Mapper {
         val intentFilters = writeColumnsIntentFiltersCSV(list)
         val inputMethods = writeColumnsInputMethodsCSV(list)
         val outputMethods = writeColumnsOutputMethodsCSV(list)
-        searchPIIMethods(list)
+        val (pii, icp)  = searchPIIMethods(list)
 
 
         writeCsvFile(mapListDbModelToListEntity(list), NAME_MAIN_FILE)
@@ -27,7 +27,7 @@ class Mapper {
 
 
         writeColumnsInputMethodsCSV(list).indices.forEach {
-            conRows.add(listOf(rows[it], permissions[it], intentFilters[it], inputMethods[it], outputMethods[it]).flatten())
+            conRows.add(listOf(rows[it], permissions[it], intentFilters[it], inputMethods[it], outputMethods[it], listOf(pii[it], icp[it])).flatten())
         }
         csvWriter().writeAll(conRows, nameDataFrame)
     }
@@ -203,9 +203,13 @@ class Mapper {
         return mapOfIntent.filter { it.value > 5 }.map { it.key }.toList()
     }
 
-    private fun searchPIIMethods(listApps: List<AppPojoMongo>) {
+    private fun searchPIIMethods(listApps: List<AppPojoMongo>): Pair<List<Any>, List<Any>> {
         val setPiiMethods = mutableSetOf<String>()
         val setIcpMethods = mutableSetOf<String>()
+        val piiList = mutableListOf<Any>()
+        val icpList = mutableListOf<Any>()
+        piiList.add("pii")
+        icpList.add("icp")
         listApps.forEach { app ->
             app.methods.foundInputMethods?.forEach { methods ->
                 val piiName = signsPii(methods.key)
@@ -214,13 +218,15 @@ class Mapper {
                 if (icpName != UNKNOWN_METHOD) setIcpMethods.add(icpName)
 
             }
-
-            print("PII: ${setPiiMethods.size.toFloat() / SignsPII.values().size * 100}   ")
+            piiList.add((setPiiMethods.size.toDouble() / SignsPII.values().size * 100).toString().replace(",",".").take(4))
+            //   print("PII: ${setPiiMethods.size.toFloat() / SignsPII.values().size * 100}")
             setPiiMethods.clear()
-            println("ICP: ${setIcpMethods.size.toFloat() / SignsICP.values().size * 100}      $setIcpMethods")
+            // println("ICP: ${setIcpMethods.size.toFloat() / SignsICP.values().size * 100}      $setIcpMethods")
+            icpList.add((setIcpMethods.size.toDouble() / SignsICP.values().size * 100).toString().replace(",",".").take(4))
             setIcpMethods.clear()
             //  println(setIcpMethods)
         }
+        return piiList to icpList
 
     }
 
@@ -282,7 +288,8 @@ class Mapper {
         PII.values().forEach {
             if (it.name.contains(nameClass)) {
                 return when (PII.valueOf(nameClass)) {
-                    Voicemails, SipManager, Calls, TelephonyManager, Contacts, Calendar, AudioRecord, MediaRecorder, SMS, Profile, TelephonyManagerCompat, Camera -> MAIN_INFORMATION.name
+                    Voicemails, SipManager, Calls, TelephonyManager, Contacts, Calendar, AudioRecord, MediaRecorder, SMS, Profile, TelephonyManagerCompat,
+                    Camera -> MAIN_INFORMATION.name
                     CameraManager, CameraCaptureSession, CameraDevice, ImageCapture, PendingRecording -> IRIS_OF_EYES_OR_CAMERA.name
                     SensorManager -> HEALTH.name
                     Environment -> PASSPORT_DATA.name
@@ -309,6 +316,8 @@ class Mapper {
         }
         return UNKNOWN_METHOD
     }
+
+    private fun String.format(digits: Int) = "%.${digits}f".format(this).toDouble()
 
     companion object {
         const val NAME_MAIN_FILE = "base_data.csv"

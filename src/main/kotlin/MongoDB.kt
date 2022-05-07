@@ -29,8 +29,8 @@ fun main() {
 
 
     runBlocking {
-        val list2: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "TOOLS").toList()
-    //    val list2: List<AppPojoMongo> = col.findAndCast<AppPojoMongo>().toList()
+       // val list2: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "TOOLS").toList()
+        val list2: List<AppPojoMongo> = col.findAndCast<AppPojoMongo>().toList()
 
 
 
