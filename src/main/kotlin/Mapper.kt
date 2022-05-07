@@ -1,4 +1,6 @@
 import Categories.*
+import PII.*
+import SignsPII.*
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import java.io.File
@@ -14,6 +16,8 @@ class Mapper {
         val intentFilters = writeColumnsIntentFiltersCSV(list)
         val inputMethods = writeColumnsInputMethodsCSV(list)
         val outputMethods = writeColumnsOutputMethodsCSV(list)
+        searchPIIMethods(list)
+
 
         writeCsvFile(mapListDbModelToListEntity(list), NAME_MAIN_FILE)
 
@@ -199,13 +203,34 @@ class Mapper {
         return mapOfIntent.filter { it.value > 5 }.map { it.key }.toList()
     }
 
+    private fun searchPIIMethods(listApps: List<AppPojoMongo>) {
+        val setPiiMethods = mutableSetOf<String>()
+        val setIcpMethods = mutableSetOf<String>()
+        listApps.forEach { app ->
+            app.methods.foundInputMethods?.forEach { methods ->
+                val piiName = signsPii(methods.key)
+                val icpName = signsIcp(methods.key)
+                if (piiName != UNKNOWN_METHOD) setPiiMethods.add(piiName)
+                if (icpName != UNKNOWN_METHOD) setIcpMethods.add(icpName)
+
+            }
+
+            print("PII: ${setPiiMethods.size.toFloat() / SignsPII.values().size * 100}   ")
+            setPiiMethods.clear()
+            println("ICP: ${setIcpMethods.size.toFloat() / SignsICP.values().size * 100}      $setIcpMethods")
+            setIcpMethods.clear()
+            //  println(setIcpMethods)
+        }
+
+    }
+
 
     private fun mapDbToCsvValue(appPojoMongo: AppPojoMongo) =
         with(appPojoMongo) {
             AppPojoCSV(
                 appName = appName,
                 activities = activities.size,
-                category = category,
+                category = changeCategory(category),
                 maxSdk = maxSdk,
                 minSdk = minSdk,
                 targetSdk = targetSdk,
@@ -236,7 +261,7 @@ class Mapper {
     }
 
     private fun changeCategory(category: String): String {
-        when (Categories.valueOf(category)) {
+        val categories = when (Categories.valueOf(category)) {
             GAME_CASINO, GAME_SIMULATION, GAME_CARD, GAME_CASUAL, GAME_SPORTS, GAME_MUSIC, GAME_BOARD, GAME_TRIVIA, GAME_PUZZLE, GAME_ADVENTURE, GAME_STRATEGY,
             GAME_ARCADE, GAME_RACING, GAME_ACTION, GAME_ROLE_PLAYING, GAME_EDUCATIONAL, GAME_WORD -> return GAMES.name
             BOOKS_AND_REFERENCE, COMICS, NEWS_AND_MAGAZINES, EVENTS, LIBRARIES_AND_DEMO -> return BOOKS_AND_NEWS.name
@@ -246,15 +271,50 @@ class Mapper {
             HEALTH_AND_FITNESS, AUTO_AND_VEHICLES, SPORTS -> return LIFESTYLE.name
             BUSINESS, PARENTING, WEATHER -> return OTHER.name
             MUSIC_AND_AUDIO, PERSONALIZATION, HOUSE_AND_HOME, PHOTOGRAPHY, VIDEO_PLAYERS, PRODUCTIVITY, TOOLS -> return TOOLS.name
-            EDUCATION, FINANCE, MEDICAL, ART_AND_DESIGN -> return OTHER.name
+            EDUCATION, FINANCE, MEDICAL, ART_AND_DESIGN -> return EDUCATION.name
             else -> return UNDEFINED
         }
-       return UNDEFINED
+        return categories
+    }
+
+    private fun signsPii(methods: String): String {
+        val nameClass = methods.split("/").last().replace(";", "")
+        PII.values().forEach {
+            if (it.name.contains(nameClass)) {
+                return when (PII.valueOf(nameClass)) {
+                    Voicemails, SipManager, Calls, TelephonyManager, Contacts, Calendar, AudioRecord, MediaRecorder, SMS, Profile, TelephonyManagerCompat, Camera -> MAIN_INFORMATION.name
+                    CameraManager, CameraCaptureSession, CameraDevice, ImageCapture, PendingRecording -> IRIS_OF_EYES_OR_CAMERA.name
+                    SensorManager -> HEALTH.name
+                    Environment -> PASSPORT_DATA.name
+                    LocationManager, LocationManagerCompat, FusedLocationProviderClient -> LOCATION.name
+                    FingerprintManager, FingerprintManagerCompat, BiometricPrompt -> FINGERPRINT.name
+                    Purchase, PurchaseHistoryRecord -> BANK_CARDS.name
+                }
+            }
+        }
+        return UNKNOWN_METHOD
+    }
+
+    private fun signsIcp(methods: String): String {
+        val nameClass = methods.split("/").last().replace(";", "")
+        ICP.values().forEach {
+            if (it.name.contains(nameClass)) {
+                return when (ICP.valueOf(nameClass)) {  //
+                    ICP.BluetoothConfigManager -> SignsICP.BLUETOOTH.name
+                    ICP.ConnectivityManager, ICP.ConnectivityManagerCompat, ICP.NetworkInfo, ICP.NetworkCapabilities -> SignsICP.NETWORK_MONITOR.name
+                    ICP.WifiManager -> SignsICP.WIFI.name
+                    ICP.AccountManager -> SignsICP.MAIN_INFORMATION.name
+                }
+            }
+        }
+        return UNKNOWN_METHOD
     }
 
     companion object {
         const val NAME_MAIN_FILE = "base_data.csv"
         const val UNDEFINED = "UNDEFINED_CATEGORY"
+        const val UNKNOWN_METHOD = "UNKNOWN_METHOD"
+
     }
 
 }

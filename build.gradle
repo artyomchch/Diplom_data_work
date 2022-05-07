@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.20'
     id 'java'
 }
 
@@ -17,10 +17,10 @@ dependencies {
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.13.2'
     implementation("com.github.doyaaaaaken:kotlin-csv-jvm:1.2.0") //for JVM platform
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation "org.litote.kmongo:kmongo-async:4.5.0"
+    implementation 'org.litote.kmongo:kmongo-async:4.5.1'
     implementation 'ch.qos.logback:logback-classic:1.2.11'
-    implementation 'org.mongodb:mongodb-driver-legacy:4.1.1'
-    implementation("org.litote.kmongo:kmongo-coroutine:4.5.0")
+  //  implementation 'org.mongodb:mongodb-driver-legacy:4.6.0'
+    implementation('org.litote.kmongo:kmongo-coroutine:4.5.1')
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
