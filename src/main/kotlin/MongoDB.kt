@@ -3,7 +3,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import kotlinx.coroutines.runBlocking
 import org.litote.kmongo.coroutine.coroutine
-import org.litote.kmongo.eq
 import org.litote.kmongo.reactivestreams.KMongo
 
 
@@ -29,9 +28,8 @@ fun main() {
 
 
     runBlocking {
-       // val list2: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "TOOLS").toList()
+        //    val list2: List<AppPojoMongo> = col.find(AppPojoMongo::category eq "SOCIAL").toList()
         val list2: List<AppPojoMongo> = col.findAndCast<AppPojoMongo>().toList()
-
 
 
         //    mapper.writeCsvFile(mapper.mapListDbModelToListEntity(list), "base_data.csv")
@@ -41,12 +39,11 @@ fun main() {
 
         // mapper.writeColumnsPermissionCSV(list, "permission.csv")
 
-       // mapper.writeColumnsIntentFiltersCSV(list, "intent_filters.csv")
+        // mapper.writeColumnsIntentFiltersCSV(list, "intent_filters.csv")
 
-       // mapper.writeColumnsInputMethodsCSV(list, "input_methods.csv")
+        // mapper.writeColumnsInputMethodsCSV(list, "input_methods.csv")
 
-       // mapper.writeColumnsOutputMethodsCSV(list, "output_methods.csv")
-
+        // mapper.writeColumnsOutputMethodsCSV(list, "output_methods.csv")
 
 
         println("Done")

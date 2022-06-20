@@ -109,7 +109,8 @@ class Mapper {
             it.methods.foundInputMethods
                 ?.forEach { methods ->
                     methods.value.forEach { method ->
-                        if (!method.contains("/") && (!method.contains("."))) mapOfInputMethods.merge((method), 1, Int::plus)
+                       // if (!method.contains("/") && (!method.contains(".")))
+                            mapOfInputMethods.merge((method), 1, Int::plus)
                     }
                 }
         }
@@ -219,12 +220,9 @@ class Mapper {
 
             }
             piiList.add((setPiiMethods.size.toDouble() / SignsPII.values().size * 100).toString().replace(",",".").take(4))
-            //   print("PII: ${setPiiMethods.size.toFloat() / SignsPII.values().size * 100}")
             setPiiMethods.clear()
-            // println("ICP: ${setIcpMethods.size.toFloat() / SignsICP.values().size * 100}      $setIcpMethods")
             icpList.add((setIcpMethods.size.toDouble() / SignsICP.values().size * 100).toString().replace(",",".").take(4))
             setIcpMethods.clear()
-            //  println(setIcpMethods)
         }
         return piiList to icpList
 
@@ -282,20 +280,16 @@ class Mapper {
         }
         return categories
     }
-
+//
     private fun signsPii(methods: String): String {
         val nameClass = methods.split("/").last().replace(";", "")
         PII.values().forEach {
             if (it.name.contains(nameClass)) {
                 return when (PII.valueOf(nameClass)) {
-                    Voicemails, SipManager, Calls, TelephonyManager, Contacts, Calendar, AudioRecord, MediaRecorder, SMS, Profile, TelephonyManagerCompat,
-                    Camera -> MAIN_INFORMATION.name
-                    CameraManager, CameraCaptureSession, CameraDevice, ImageCapture, PendingRecording -> IRIS_OF_EYES_OR_CAMERA.name
-                    SensorManager -> HEALTH.name
-                    Environment -> PASSPORT_DATA.name
-                    LocationManager, LocationManagerCompat, FusedLocationProviderClient -> LOCATION.name
-                    FingerprintManager, FingerprintManagerCompat, BiometricPrompt -> FINGERPRINT.name
+                    Profile -> MAIN_INFORMATION.name
                     Purchase, PurchaseHistoryRecord -> BANK_CARDS.name
+                    Environment -> PASSPORT_DATA.name
+                    FingerprintManager, FingerprintManagerCompat, BiometricPrompt -> FINGERPRINT.name
                 }
             }
         }
@@ -307,10 +301,15 @@ class Mapper {
         ICP.values().forEach {
             if (it.name.contains(nameClass)) {
                 return when (ICP.valueOf(nameClass)) {  //
+                    ICP.Calendar, ICP.AccountManager, ICP.Environment, ICP.Contacts, ICP.Calls, ICP.SMS, ICP.SipManager, ICP.PendingRecording, ICP.Voicemails,
+                    ICP.TelephonyManager, ICP.TelephonyManagerCompat -> SignsICP.MAIN_INFORMATION.name
+                    ICP.WifiManager, ICP.NetworkInfo, ICP.NetworkCapabilities-> SignsICP.WIFI.name
                     ICP.BluetoothConfigManager -> SignsICP.BLUETOOTH.name
-                    ICP.ConnectivityManager, ICP.ConnectivityManagerCompat, ICP.NetworkInfo, ICP.NetworkCapabilities -> SignsICP.NETWORK_MONITOR.name
-                    ICP.WifiManager -> SignsICP.WIFI.name
-                    ICP.AccountManager -> SignsICP.MAIN_INFORMATION.name
+                    ICP.ConnectivityManager, ICP.ConnectivityManagerCompat -> SignsICP.NETWORK_MONITOR.name
+                    ICP.LocationManagerCompat, ICP.LocationManager, ICP.FusedLocationProviderClient -> SignsICP.LOCATION.name
+                    ICP.AudioRecord, ICP.MediaRecorder -> SignsICP.MEDIA_DATA.name
+                    ICP.Camera, ICP.CameraManager, ICP.CameraCaptureSession, ICP.CameraDevice, ICP.ImageCapture -> SignsICP.IRIS_OF_EYES_OR_CAMERA.name
+                    ICP.SensorManager -> SignsICP.HEALTH.name
                 }
             }
         }
